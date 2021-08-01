@@ -12,7 +12,7 @@ Only commands are sent through the Arduino. Dictation is still processed normall
 The goal is to also have an option to send Dragon dictation via the Arduino, but it will probably require full keyboard control. In that case, you would need a dedicated machine or VM that just runs Dragon, but that probably won't be a problem because if you don't have an additional machine or VMs, you can just disable this option and everything should still work. Only one process can communicate with the serial port at a time so the implementation will require interprocess communication.
 
 ## Requirements
-- Unfortunately, this does require an Arduino. Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do.
+- Unfortunately, this does require an Arduino and to micro USB cables to connect it to the host computer and the receiving computer (which can be the same as the host). Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do.
 - [Dragonfly](https://github.com/dictation-toolbox/dragonfly) and possibly [Caster](https://github.com/dictation-toolbox/Caster)
 - `pip install pyserial`
 
