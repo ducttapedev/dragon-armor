@@ -1,6 +1,14 @@
 # Caster Arduino
 This mini-project enables Dragon to send real hardware keystrokes via USB that should be indistinguishable from a normal keyboard. You can also send keystroke's from one computer with Dragon installed to another computer without. It is built on top of the [Caster](https://github.com/dictation-toolbox/Caster) project, which is itself built on the [Dragonfly](https://github.com/dictation-toolbox/dragonfly) framework. It currently does not depend on any Caster files so it should theoretically work on just Dragonfly, although I have not verified this (please modify this readme if you do).|
 
+## Motivation
+Caster, Dragonfly, and [Natlink](https://github.com/dictation-toolbox/natlink) have been incredibly useful for those who wish to reduce keyboard usage and those with disabilities that cannot use a normal keyboard, myself included. However, because a virtual keyboard is used, they don't work properly or at all in some situations (e.g. VMware). By sending keystrokes via USB that are indistinguishable from a real keyboard, it should work with all programs.
+
+This also enables you to have one copy of Dragon control multiple computers, so that you don't have to  reconfigure and retrain Dragon on each of your computers. Yes, you can export and import profiles, but they will inevitably get out of sync if you switch frequently between computers. Furthermore, not everything gets transferred, such as pronunciations.
+
+## Limitations
+This currently only works for commands because dictation does not go through Dragonfly. The goal is to also support Dragon dictation, but it will probably require full keyboard control. In that case, you would need a dedicated machine or VM that just runs Dragon. Only one process can communicate with the serial port at a time so the implementation will require interprocess communication.
+
 ## Requirements
 - Unfortunately, this does require an Arduino. Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do.
 - [Dragonfly](https://github.com/dictation-toolbox/dragonfly) and possibly [Caster](https://github.com/dictation-toolbox/Caster)
@@ -16,7 +24,4 @@ This mini-project enables Dragon to send real hardware keystrokes via USB that s
 7. Click on the upload button in the top left (a rightward pointing arrow) to upload your code onto the Arduino
 8. Replace the `$castor_installation_directory/castervoice/__init__.py` file in your Caster installation with the file in the same path in this repository
 
-Now you can launch Dragon and all commands will be sent as hardware keyboard strokes to the output port on the Arduino. It is easier to verify if the output is on a different computer,
-
-## Limitations
-This currently only works for commands because dictation does not go through Dragonfly. The goal is to also support Dragon dictation, but it will probably require full keyboard control. In that case, you would need a dedicated machine or VM that just runs Dragon. Only one process can communicate with the serial port at a time so the implementation will require interprocess communication.
+Now you can launch Dragon and all commands will be sent as hardware keyboard strokes to the output port on the Arduino. It is easier to verify if the output is on a different computer.
