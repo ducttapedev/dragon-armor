@@ -1,5 +1,6 @@
 import inspect
 import logging
+import os
 import struct
 import threading
 
@@ -9,11 +10,14 @@ from dragonfly.actions.action_base_keyboard import BaseKeyboardAction
 from dragonfly.actions.keyboard._base import BaseKeyboard
 from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 
-USE_ARDUINO = True
+USE_ARDUINO = os.getenv("USE_ARDUINO", True)
+PORT = os.getenv("PORT", "COM3")
+COMMUNICATION_RATE = 9600
+
 
 name = "castervoice"
 if USE_ARDUINO:
-    arduino = serial.Serial('COM3', 9600, timeout=0.05)
+    arduino = serial.Serial(PORT, COMMUNICATION_RATE, timeout=0.05)
 
 
 # This prints any data we receive from the Arduino programing port (not the keyboard port)
