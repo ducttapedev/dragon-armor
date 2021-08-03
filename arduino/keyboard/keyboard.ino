@@ -4,7 +4,7 @@ const int PRESS = 1;
 const int RELEASE = 2;
 //int TYPE = 1;
 
-void setup() {from 
+void setup() { 
   // open the serial port:
   Serial.begin(9600);
   // initialize control over the keyboard:
