@@ -24,6 +24,6 @@ The goal is to also have an option to send Dragon dictation via the Arduino, but
 5. Go to Tools > Board > Arduino ARM (32-bit) Boards > Arduino Due (Programming Port)
 6. Go to File > Open and open the `keyboard/keyboard.ino` file in this repository
 7. Click on the upload button in the top left (a rightward pointing arrow) to upload your code onto the Arduino
-8. Replace the `$castor_installation_directory/castervoice/__init__.py` file in your Caster installation with the file in the same path in this repository
+8. Clone the repo to your caster or dragonfly installation directory (e.g. Documents/Caster). Dragonfly will automatically the files starting with "_" in the root directory.
 
 Now you can launch Dragon and all commands will be sent as hardware keyboard strokes to the output port on the Arduino. It is easier to verify if the output is on a different computer.
