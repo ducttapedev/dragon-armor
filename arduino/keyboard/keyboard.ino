@@ -2,7 +2,7 @@
 
 const int PRESS = 1;
 const int RELEASE = 2;
-//int TYPE = 1;
+const int TYPE = 3;
 
 void setup() { 
   // open the serial port:
@@ -26,6 +26,9 @@ void loop() {
        case RELEASE:
         Keyboard.release(character);
         break;
+       case TYPE:
+        Keyboard.write(character);
+        break;       
     }
   }
 }
