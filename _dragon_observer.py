@@ -33,7 +33,11 @@ class Observer(RecognitionObserver):
         # for x in [words, rule, node]:
         #     print("on_recognition: " + str(repr(x)))
         recognition_list = results.getResults(0)
-        dictation_words = [word for word, recognition_type in recognition_list if recognition_type == 0]
+        dictation_words = [
+            word.split("\\")[0]
+            for word, recognition_type in recognition_list
+            if recognition_type == 0
+        ]
         for letter in " ".join(dictation_words):
             ARDUINO.write(letter + TYPE + "\x00")
 
@@ -75,9 +79,9 @@ class Observer(RecognitionObserver):
         :param results: *optional* engine recognition results object
         :type results: :ref:`engine-specific type<RefGrammarCallbackResultsTypes>`
         """
-        # for x in [words, rule, node]:
-        #     print("on_post_recognition: " + str(repr(x)))
-        # print("on_post_recognition: " + str(repr(results.getResults(0))))
+        for x in [words, rule, node]:
+            print("on_post_recognition: " + str(repr(x)))
+        print("on_post_recognition: " + str(repr(results.getResults(0))))
 
 
 if USE_ARDUINO:
