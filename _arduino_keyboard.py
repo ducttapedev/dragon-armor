@@ -7,7 +7,10 @@ from dragonfly.actions.action_base_keyboard import BaseKeyboardAction
 from dragonfly.actions.keyboard._base import BaseKeyboard
 from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 
-from arduino_serial import ARDUINO, PRESS, RELEASE, USE_ARDUINO
+from arduino_serial import PRESS, RELEASE, USE_ARDUINO
+
+if USE_ARDUINO:
+    from arduino_serial import ARDUINO
 
 
 class ArduinoSymbols(Win32KeySymbols):

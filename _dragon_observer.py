@@ -1,5 +1,9 @@
 from dragonfly import RecognitionObserver
-from arduino_serial import ARDUINO, USE_ARDUINO, TYPE
+
+from arduino_serial import USE_ARDUINO, TYPE
+
+if USE_ARDUINO:
+    from arduino_serial import ARDUINO
 
 
 class Observer(RecognitionObserver):

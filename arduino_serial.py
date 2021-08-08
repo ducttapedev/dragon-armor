@@ -3,7 +3,7 @@ import threading
 
 import serial
 
-USE_ARDUINO = os.getenv("USE_ARDUINO", True)
+USE_ARDUINO = os.getenv("USE_ARDUINO", False)
 PORT = os.getenv("PORT", "COM3")
 COMMUNICATION_RATE = 9600
 
