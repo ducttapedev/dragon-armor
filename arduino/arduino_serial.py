@@ -30,4 +30,5 @@ def connect_arduino():
 
 
 if USE_ARDUINO:
+    ARDUINO_LOCK = threading.Lock()
     ARDUINO = connect_arduino()
