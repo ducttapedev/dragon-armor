@@ -2,7 +2,7 @@ import threading
 from msvcrt import getch
 from multiprocessing.connection import Listener
 
-from arduino.environment import INTERPROCESS_ADDRESS
+from environment import INTERPROCESS_ADDRESS
 
 
 def receive_commands_from_dragonfly():    # family is deduced to be 'AF_INET'

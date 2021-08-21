@@ -3,7 +3,7 @@ import threading
 
 import serial
 
-from arduino.environment import USE_ARDUINO
+from environment import USE_ARDUINO
 
 PORT = os.getenv("PORT", "COM3")
 COMMUNICATION_RATE = 9600
