@@ -91,7 +91,7 @@ class ArduinoKeyboard(BaseKeyboard):
                 character = character.encode("ascii")
 
             # Arduino is expecting a three byte array of [character, press/release byte, null byte]
-            arduino_commands = character + (PRESS if down else RELEASE) + "\x00"
+            arduino_commands = character + (PRESS if down else RELEASE) + b"\x00"
             # ARDUINO.write(arduino_commands)
             connection.send(arduino_commands)
 
