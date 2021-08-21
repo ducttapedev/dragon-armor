@@ -7,10 +7,10 @@ from dragonfly.actions.action_base_keyboard import BaseKeyboardAction
 from dragonfly.actions.keyboard._base import BaseKeyboard
 from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 
-from arduino_serial import PRESS, RELEASE, USE_ARDUINO
+from arduino.environment import PRESS, RELEASE, USE_ARDUINO, INTERPROCESS_ADDRESS
+from multiprocessing.connection import Client
 
-if USE_ARDUINO:
-    from arduino_serial import ARDUINO
+connection = Client(INTERPROCESS_ADDRESS, authkey=b'secret password')
 
 
 class ArduinoSymbols(Win32KeySymbols):
@@ -77,7 +77,7 @@ class ArduinoKeyboard(BaseKeyboard):
                 # Hence we use reflection to convert the KeySymbols code into an ArduinoSymbols code
                 key_members = inspect.getmembers(dragonfly.actions.keyboard.KeySymbols)
                 arduino_members = inspect.getmembers(ArduinoSymbols)
-                matching_member = next(iter(filter(lambda (_, value): value == character, key_members)), None)
+                matching_member = next(iter(filter(lambda field: field[1] == character, key_members)), None)
                 if matching_member:
                     character = dict(arduino_members)[matching_member[0]]
 
@@ -91,7 +91,9 @@ class ArduinoKeyboard(BaseKeyboard):
                 character = character.encode("ascii")
 
             # Arduino is expecting a three byte array of [character, press/release byte, null byte]
-            ARDUINO.write(character + (PRESS if down else RELEASE) + "\x00")
+            arduino_commands = character + (PRESS if down else RELEASE) + "\x00"
+            # ARDUINO.write(arduino_commands)
+            connection.send(arduino_commands)
 
     @classmethod
     def get_current_layout(cls):

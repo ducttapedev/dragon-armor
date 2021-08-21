@@ -3,13 +3,10 @@ import threading
 
 import serial
 
-USE_ARDUINO = os.getenv("USE_ARDUINO", False)
+from arduino.environment import USE_ARDUINO
+
 PORT = os.getenv("PORT", "COM3")
 COMMUNICATION_RATE = 9600
-
-PRESS = b"\x01"
-RELEASE = b"\x02"
-TYPE = b"\x03"
 
 
 def connect_arduino():
