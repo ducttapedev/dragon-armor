@@ -16,27 +16,20 @@ def receive_commands_from_dragonfly():    # family is deduced to be 'AF_INET'
         try:
             message = connection.recv()
             print(message)
-            ARDUINO_LOCK.acquire()
             ARDUINO.write(message)
         except EOFError as e:
             # listener.close()
             print("Reached EOF?")
             # break
-        finally:
-            ARDUINO_LOCK.release()
 
 
 def receive_dictation_from_dragon():
     while True:
-        try:
-            character = getch()
-            print(character)
-            ARDUINO_LOCK.acquire()
-            # Arduino is expecting a three byte array of [character, press/release byte, null byte]
-            arduino_commands = character + TYPE + b"\x00"
-            ARDUINO.write(arduino_commands)
-        finally:
-            ARDUINO_LOCK.release()
+        character = getch()
+        print(character)
+        # Arduino is expecting a three byte array of [character, press/release byte, null byte]
+        arduino_commands = character + TYPE + b"\x00"
+        ARDUINO.write(arduino_commands)
 
 
 def main():
