@@ -5,6 +5,8 @@ import serial
 
 from serial import SerialException
 
+from environment import USE_ARDUINO
+
 PORT = os.getenv("PORT", "COM3")
 COMMUNICATION_RATE = 9600
 
@@ -46,3 +48,8 @@ def reconnect_arduino():
     #         print("Error reconnecting to Arduino")
     #         print(traceback.format_exc())
     # print("Reconnected to Arduino!")
+
+
+if USE_ARDUINO:
+    ARDUINO_LOCK = threading.Lock()
+    ARDUINO = connect_arduino()

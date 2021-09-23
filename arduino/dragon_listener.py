@@ -6,7 +6,7 @@ from multiprocessing.connection import Listener
 from serial import SerialException
 
 from arduino_serial import reconnect_arduino
-from environment import ARDUINO
+from arduino_serial import ARDUINO
 from environment import INTERPROCESS_ADDRESS, TYPE
 
 
