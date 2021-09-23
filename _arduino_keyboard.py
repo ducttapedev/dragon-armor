@@ -2,6 +2,8 @@ import inspect
 import logging
 import struct
 import threading
+import traceback
+
 import arduino.environment
 from multiprocessing.connection import Client
 
@@ -13,12 +15,13 @@ from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 from arduino.environment import PRESS, RELEASE, USE_ARDUINO, INTERPROCESS_ADDRESS
 
 
+# check if we are disconnected every five seconds, and if so, reconnect
 def interprocess_connect():
     threading.Timer(5.0, interprocess_connect).start()
-    print("rec")
     if not arduino.environment.connection:
-        print("conn")
+        print("Attempting to reconnect interprocess communication")
         arduino.environment.connection = Client(INTERPROCESS_ADDRESS, authkey=b'secret password')
+        print("Interprocess communication reconnected!")
 
 
 interprocess_connect()
@@ -106,6 +109,8 @@ class ArduinoKeyboard(BaseKeyboard):
                 # ARDUINO.write(arduino_commands)
                 arduino.environment.connection.send(arduino_commands)
         except Exception as e:
+            print("Error with interprocess communication!")
+            print(traceback.format_exc())
             arduino.environment.connection = None
 
     @classmethod
