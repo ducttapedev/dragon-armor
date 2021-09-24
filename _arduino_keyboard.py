@@ -136,3 +136,7 @@ class ArduinoKeyboard(BaseKeyboard):
 # instead of the dragonfly virtual keyboard
 if USE_ARDUINO:
     BaseKeyboardAction._keyboard = ArduinoKeyboard()
+    key_members = inspect.getmembers(dragonfly.actions.keyboard.KeySymbols)
+    print(f"key_members = {key_members}")
+    arduino_members = inspect.getmembers(ArduinoSymbols)
+    print(f"arduino_members = {arduino_members}")
