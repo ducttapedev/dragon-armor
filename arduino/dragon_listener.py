@@ -18,7 +18,7 @@ def receive_commands_from_dragonfly():    # family is deduced to be 'AF_INET'
     LOGGER.info("Listening for connection")
 
     connection = listener.accept()
-    LOGGER.info('connection accepted from', listener.last_accepted)
+    LOGGER.info(f"connection accepted from {listener.last_accepted}")
     while True:
         try:
             message = connection.recv()
