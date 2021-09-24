@@ -100,7 +100,7 @@ class ArduinoKeyboard(BaseKeyboard):
 
                 # When the character is an integer, this typically indicate some key combination such as control+C
                 if type(character) == int:
-                    character = windows_virtual_to_ascii(character)
+                    character = ord(windows_virtual_to_ascii(character))
                     print(f"Converting Windows virtual keycode to ASCII: {character}")
                     # Ideally we would set dragonfly.actions.keyboard.KeySymbols = ArduinoSymbols
                     # However this is not possible without modifying the dragonfly.actions.keyboard file
