@@ -1,3 +1,4 @@
+import logging
 import os
 import threading
 import traceback
@@ -7,18 +8,19 @@ from serial import SerialException
 
 from environment import USE_ARDUINO
 
+LOGGER = logging.getLogger(__name__)
 PORT = os.getenv("PORT", "COM3")
 COMMUNICATION_RATE = 9600
 
 
 def connect_arduino():
-    print("Connecting to Arduino")
+    LOGGER.info("Connecting to Arduino")
     arduino = serial.Serial(PORT, COMMUNICATION_RATE, timeout=0.05)
 
     # This prints any data we receive from the Arduino programing port (not the keyboard port)
     def handle_data(data):
         if data:
-            print("arduino = " + str(data))
+            LOGGER.error("arduino = " + str(data))
 
     def read_from_port():
         while True:
@@ -26,18 +28,18 @@ def connect_arduino():
                 reading = arduino.readline()
                 handle_data(reading)
             except SerialException as e:
-                print("Error reading from Arduino")
-                print(traceback.format_exc())
+                LOGGER.error("Error reading from Arduino")
+                LOGGER.error(traceback.format_exc())
                 reconnect_arduino()
 
     thread = threading.Thread(target=read_from_port)
     thread.start()
-    print("Arduino connected")
+    LOGGER.info("Arduino connected")
     return arduino
 
 
 def reconnect_arduino():
-    print("reconnection to Arduino currently not supported (we get access denied error)! restart program")
+    LOGGER.error("reconnection to Arduino currently not supported (we get access denied error)! restart program")
     exit(0)
     # print("Attempting to reconnect to Arduino")
     # environment.ARDUINO = None

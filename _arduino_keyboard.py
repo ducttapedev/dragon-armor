@@ -35,9 +35,9 @@ def windows_virtual_to_ascii(vk, sc=0, wfl=0, hkid=None):
 def interprocess_connect():
     threading.Timer(5.0, interprocess_connect).start()
     if not arduino.environment.connection:
-        print("Attempting to reconnect interprocess communication")
+        LOGGER.warning("Attempting to reconnect interprocess communication")
         arduino.environment.connection = Client(INTERPROCESS_ADDRESS, authkey=b'secret password')
-        print("Interprocess communication reconnected!")
+        LOGGER.warning("Interprocess communication reconnected!")
 
 
 interprocess_connect()

@@ -1,3 +1,4 @@
+import logging
 import threading
 import traceback
 from msvcrt import getch
@@ -9,43 +10,45 @@ from arduino_serial import reconnect_arduino
 from arduino_serial import ARDUINO
 from environment import INTERPROCESS_ADDRESS, TYPE
 
+LOGGER = logging.getLogger(__name__)
+
 
 def receive_commands_from_dragonfly():    # family is deduced to be 'AF_INET'
     listener = Listener(INTERPROCESS_ADDRESS, authkey=b'secret password')
-    print("Listening for connection")
+    LOGGER.info("Listening for connection")
 
     connection = listener.accept()
-    print('connection accepted from', listener.last_accepted)
+    LOGGER.info('connection accepted from', listener.last_accepted)
     while True:
         try:
             message = connection.recv()
-            print(message)
+            LOGGER.info(f"Dragonfly: {message}")
             ARDUINO.write(message)
         except SerialException as e:
-            print("Error listening to Dragon Dictation, Arduino disconnected?")
-            print(traceback.format_exc())
+            LOGGER.error("Error listening to Dragon Dictation, Arduino disconnected?")
+            LOGGER.error(traceback.format_exc())
             reconnect_arduino()
         except Exception as e:
-            print("Error receiving commands from dragonfly")
-            print(traceback.format_exc())
+            LOGGER.error("Error receiving commands from dragonfly")
+            LOGGER.error(traceback.format_exc())
             listener.close()
             listener = Listener(INTERPROCESS_ADDRESS, authkey=b'secret password')
-            print("Disconnected, relistening for interprocess connection")
+            LOGGER.warning("Disconnected, relistening for interprocess connection")
             connection = listener.accept()
-            print("Interprocess reconnected!")
+            LOGGER.warning("Interprocess reconnected!")
 
 
 def receive_dictation_from_dragon():
     while True:
         try:
             character = getch()
-            print(character)
+            LOGGER.info(f"Dragon:    {character}")
             # Arduino is expecting a three byte array of [character, press/release byte, null byte]
             arduino_commands = character + TYPE + b"\x00"
             ARDUINO.write(arduino_commands)
         except Exception as e:
-            print("Error listening to Dragon Dictation, Arduino disconnected?")
-            print(traceback.format_exc())
+            LOGGER.error("Error listening to Dragon Dictation, Arduino disconnected?")
+            LOGGER.error(traceback.format_exc())
             reconnect_arduino()
 
 
