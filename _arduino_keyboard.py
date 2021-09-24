@@ -15,6 +15,8 @@ from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 from arduino.environment import PRESS, RELEASE, USE_ARDUINO, INTERPROCESS_ADDRESS
 from ctypes import *
 
+LOGGER = logging.getLogger(__name__)
+
 _ToAsciiEx = windll.User32.ToAsciiEx
 _ToAsciiEx.argtypes = [c_uint,c_uint,POINTER(c_char),POINTER(c_wchar),c_int,c_uint,c_void_p]
 _ToAsciiEx.restype = c_int
@@ -90,17 +92,17 @@ class ArduinoKeyboard(BaseKeyboard):
     def send_keyboard_events(cls, events):
         try:
             for event in events:
-                print(f"event = {event}")
+                LOGGER.info(f"event = {event}")
                 character, down, timeout = event[:3]
                 # Some events have a keyboard class as the character as a sort of dummy placeholder to insert delay,
                 # we ignore these
-                print(f"Processing character: {character}")
+                LOGGER.debug(f"Processing character: {character}")
                 if character in (BaseKeyboard, ArduinoKeyboard):
                     continue
 
                 # When the character is an integer, this typically indicate some key combination such as control+C
                 if type(character) == int:
-                    print(f"Converting Windows virtual keycode to ASCII: {character}")
+                    LOGGER.debug(f"Converting Windows virtual keycode to ASCII: {character}")
                     # Ideally we would set dragonfly.actions.keyboard.KeySymbols = ArduinoSymbols
                     # However this is not possible without modifying the dragonfly.actions.keyboard file
                     # Hence we use reflection to convert the KeySymbols code into an ArduinoSymbols code
@@ -109,7 +111,7 @@ class ArduinoKeyboard(BaseKeyboard):
                     matching_member = next(iter(filter(lambda field: field[1] == character, key_members)), None)
                     if matching_member:
                         character = dict(arduino_members)[matching_member[0]]
-                        print(f"Using matching member {character}")
+                        LOGGER.debug(f"Using matching member {character}")
                     else:
                         character = ord(windows_virtual_to_ascii(character))
 
@@ -118,21 +120,21 @@ class ArduinoKeyboard(BaseKeyboard):
                     # module as shift + letter
                     if 65 <= character <= 90:
                         character += 32
-                        print(f"Making character lowercase: {character}")
+                        LOGGER.debug(f"Making character lowercase: {character}")
                     character = struct.pack("B", character)
-                    print(f"Packing character: {character}")
+                    LOGGER.debug(f"Packing character: {character}")
                 else:
                     character = character.encode("ascii")
-                    print(f"Encoding character: {character}")
+                    LOGGER.debug(f"Encoding character: {character}")
 
                 # Arduino is expecting a three byte array of [character, press/release byte, null byte]
                 arduino_commands = character + (PRESS if down else RELEASE) + b"\x00"
                 # ARDUINO.write(arduino_commands)
-                print(f"Sending command: {arduino_commands}")
+                LOGGER.info(f"Sending command: {arduino_commands}")
                 arduino.environment.connection.send(arduino_commands)
         except Exception as e:
-            print("Error with interprocess communication!")
-            print(traceback.format_exc())
+            LOGGER.error("Error with interprocess communication!")
+            LOGGER.error(traceback.format_exc())
             arduino.environment.connection = None
 
     @classmethod
@@ -149,6 +151,6 @@ class ArduinoKeyboard(BaseKeyboard):
 if USE_ARDUINO:
     BaseKeyboardAction._keyboard = ArduinoKeyboard()
     key_members = inspect.getmembers(dragonfly.actions.keyboard.KeySymbols)
-    print(f"key_members = {key_members}")
+    LOGGER.debug(f"key_members = {key_members}")
     arduino_members = inspect.getmembers(ArduinoSymbols)
-    print(f"arduino_members = {arduino_members}")
+    LOGGER.debug(f"arduino_members = {arduino_members}")
