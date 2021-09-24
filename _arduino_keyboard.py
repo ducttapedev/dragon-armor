@@ -78,6 +78,7 @@ class ArduinoKeyboard(BaseKeyboard):
     def send_keyboard_events(cls, events):
         try:
             for event in events:
+                print(f"event = {event}")
                 character, down, timeout = event[:3]
                 # Some events have a keyboard class as the character as a sort of dummy placeholder to insert delay,
                 # we ignore these
