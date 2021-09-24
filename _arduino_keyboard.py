@@ -100,7 +100,6 @@ class ArduinoKeyboard(BaseKeyboard):
 
                 # When the character is an integer, this typically indicate some key combination such as control+C
                 if type(character) == int:
-                    character = ord(windows_virtual_to_ascii(character))
                     print(f"Converting Windows virtual keycode to ASCII: {character}")
                     # Ideally we would set dragonfly.actions.keyboard.KeySymbols = ArduinoSymbols
                     # However this is not possible without modifying the dragonfly.actions.keyboard file
@@ -111,6 +110,8 @@ class ArduinoKeyboard(BaseKeyboard):
                     if matching_member:
                         character = dict(arduino_members)[matching_member[0]]
                         print(f"Using matching member {character}")
+                    else:
+                        character = ord(windows_virtual_to_ascii(character))
 
                     # For some reason, key combinations will always use capital letters.
                     # We convert them to lowercase because capital letters will be interpreted by the Arduino keyboard
