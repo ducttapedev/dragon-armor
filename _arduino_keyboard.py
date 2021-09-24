@@ -81,6 +81,7 @@ class ArduinoKeyboard(BaseKeyboard):
                 character, down, timeout = event[:3]
                 # Some events have a keyboard class as the character as a sort of dummy placeholder to insert delay,
                 # we ignore these
+                print(f"Processing character: {character}")
                 if character in (BaseKeyboard, ArduinoKeyboard):
                     continue
 
@@ -94,19 +95,24 @@ class ArduinoKeyboard(BaseKeyboard):
                     matching_member = next(iter(filter(lambda field: field[1] == character, key_members)), None)
                     if matching_member:
                         character = dict(arduino_members)[matching_member[0]]
+                        print(f"Using matching member {character}")
 
                     # For some reason, key combinations will always use capital letters.
                     # We convert them to lowercase because capital letters will be interpreted by the Arduino keyboard
                     # module as shift + letter
                     if 65 <= character <= 90:
                         character += 32
+                        print(f"Making character lowercase: {character}")
                     character = struct.pack("B", character)
+                    print(f"Packing character: {character}")
                 else:
                     character = character.encode("ascii")
+                    print(f"Encoding character: {character}")
 
                 # Arduino is expecting a three byte array of [character, press/release byte, null byte]
                 arduino_commands = character + (PRESS if down else RELEASE) + b"\x00"
                 # ARDUINO.write(arduino_commands)
+                print(f"Sending command: {arduino_commands}")
                 arduino.environment.connection.send(arduino_commands)
         except Exception as e:
             print("Error with interprocess communication!")
