@@ -88,6 +88,9 @@ class ArduinoKeyboard(BaseKeyboard):
 
                 # When the character is an integer, this typically indicate some key combination such as control+C
                 if type(character) == int:
+                    if character >= 144:
+                        character -= 144
+                        print(f"Converting character exceeding 127: {character}")
                     # Ideally we would set dragonfly.actions.keyboard.KeySymbols = ArduinoSymbols
                     # However this is not possible without modifying the dragonfly.actions.keyboard file
                     # Hence we use reflection to convert the KeySymbols code into an ArduinoSymbols code
