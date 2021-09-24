@@ -13,6 +13,18 @@ from dragonfly.actions.keyboard._base import BaseKeyboard
 from dragonfly.actions.keyboard._win32 import Win32KeySymbols
 
 from arduino.environment import PRESS, RELEASE, USE_ARDUINO, INTERPROCESS_ADDRESS
+from ctypes import *
+
+_ToAsciiEx = windll.User32.ToAsciiEx
+_ToAsciiEx.argtypes = [c_uint,c_uint,POINTER(c_char),POINTER(c_wchar),c_int,c_uint,c_void_p]
+_ToAsciiEx.restype = c_int
+
+
+def windows_virtual_to_ascii(vk, sc=0, wfl=0, hkid=None):
+    kst = create_string_buffer(256)
+    b = create_unicode_buffer(5)
+    _ToAsciiEx(vk,sc,kst,b,5,wfl,hkid)
+    return b.value
 
 
 # check if we are disconnected every five seconds, and if so, reconnect
@@ -88,9 +100,8 @@ class ArduinoKeyboard(BaseKeyboard):
 
                 # When the character is an integer, this typically indicate some key combination such as control+C
                 if type(character) == int:
-                    if character >= 144:
-                        character -= 144
-                        print(f"Converting character exceeding 127: {character}")
+                    character = windows_virtual_to_ascii(character)
+                    print(f"Converting Windows virtual keycode to ASCII: {character}")
                     # Ideally we would set dragonfly.actions.keyboard.KeySymbols = ArduinoSymbols
                     # However this is not possible without modifying the dragonfly.actions.keyboard file
                     # Hence we use reflection to convert the KeySymbols code into an ArduinoSymbols code
