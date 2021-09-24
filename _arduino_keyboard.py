@@ -22,6 +22,8 @@ _ToAsciiEx.argtypes = [c_uint,c_uint,POINTER(c_char),POINTER(c_wchar),c_int,c_ui
 _ToAsciiEx.restype = c_int
 
 
+# https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-toasciiex
+# https://stackoverflow.com/questions/38224277/tounicodeex-always-returns-0-in-python
 def windows_virtual_to_ascii(vk, sc=0, wfl=0, hkid=None):
     kst = create_string_buffer(256)
     b = create_unicode_buffer(5)
@@ -113,6 +115,7 @@ class ArduinoKeyboard(BaseKeyboard):
                         character = dict(arduino_members)[matching_member[0]]
                         LOGGER.debug(f"Using matching member {character}")
                     else:
+                        # Uses Windows key codes as documented here https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
                         character = ord(windows_virtual_to_ascii(character))
 
                     # For some reason, key combinations will always use capital letters.
