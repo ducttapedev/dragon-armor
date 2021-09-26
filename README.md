@@ -1,5 +1,5 @@
 # Dragon Armor
-This mini-project enables Dragon to send real hardware keystrokes via USB that should be indistinguishable from a normal keyboard. You can also send keystrokes from one computer with Dragon installed to another computer without. It is built on top of the [Caster](https://github.com/dictation-toolbox/Caster) project, which is itself built on the [Dragonfly](https://github.com/dictation-toolbox/dragonfly) framework. It currently does not depend on any Caster files so it should theoretically work on just Dragonfly, although I have not verified this (please modify this readme if you do).|
+This mini-project enables Dragon to send real hardware keystrokes via USB that should be indistinguishable from a normal keyboard. You can also send keystrokes from one computer with Dragon installed (the "input" machine) to another computer (the "output" machine) without. It is built on top of the [Caster](https://github.com/dictation-toolbox/Caster) project, which is itself built on the [Dragonfly](https://github.com/dictation-toolbox/dragonfly) framework. It currently does not depend on any Caster files so it should theoretically work on just Dragonfly, although I have not verified this (please modify this readme if you do).|
 
 ## Motivation
 Caster, Dragonfly, and [Natlink](https://github.com/dictation-toolbox/natlink) have been incredibly useful for those who wish to reduce keyboard usage and those with disabilities that cannot use a normal keyboard, myself included. However, because a virtual keyboard is used, they don't work properly or at all in some situations (e.g. VMware). By sending keystrokes via USB that are indistinguishable from a real keyboard, it should work with all programs.
@@ -7,12 +7,16 @@ Caster, Dragonfly, and [Natlink](https://github.com/dictation-toolbox/natlink) h
 This also enables you to have one copy of Dragon control multiple computers, so that you don't have to  reconfigure and retrain Dragon on each of your computers. Yes, you can export and import profiles, but they will inevitably get out of sync if you switch frequently between computers. Furthermore, not everything gets transferred, such as pronunciations.
 
 ## Limitations
-Only commands are sent through the Arduino. Dictation is still processed normally by Dragon. If you are outputting keystrokes to a different computer from the one that Dragon is installed on, you will only be able to send commands and not dictation. Same goes if you are using a program like VMware that normally does not work with Dragon. This is because dictation does not go through Dragonfly. However, you can "convert" dictation into a command by prepending it with "say" "slip" or "cop."
+Currently I have not figured out an elegant way to send dictation directly to the Arduino (commands work fine, provided they are keyboard only). If your input and output machines are the same, Dragon functions normally as the dictation is not redirected anywhere. You will still be unable to send dictation to programs that don't work with Dragon's virtual keyboard, like VMware. However, you will now be able to send commands whereas before no interaction at all was possible. (You can also "convert" dictation into a command by prepending it with "say" "slip" or "cop.")
 
-The goal is to also have an option to send Dragon dictation via the Arduino, but it will probably require full keyboard control. In that case, you would need a dedicated machine or VM that just runs Dragon, but that probably won't be a problem because if you don't have an additional machine or VMs, you can just disable this option and everything should still work. Only one process can communicate with the serial port at a time so the implementation will require interprocess communication.
+If your input and output machines are different, I have a workaround using Python's `getch` and focusing Dragon on the `arduino/run.bat` process, so that every dictation keystroke is captured by the program. Since this is a separate process from Dragon/dragonfly, we use interprocess communication to send commands from dragonfly to `arduino/run.bat` (dragonfly commands can be elegantly captured and sent to the Arduino without using the `getch` hack). `arduino/run.bat` sends both direct dictation and dragonfly commands received via interprocess communication to the Arduino. Dictation stops working if the `arduino/run.bat` process is no longer focused.
+
+Currently only keyboard commands are supported. Mouse commands don't work yet.
+
+Sometimes, particularly when Dragon armor is first started, you may have to send dictation through `arduino/run.bat` before commands work. This issue is probably fixable.
 
 ## Requirements
-- Unfortunately, this does require an Arduino and to micro USB cables to connect it to the host computer and the receiving computer (which can be the same as the host). Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do.
+- Unfortunately, this does require an Arduino and 2 micro USB cables to connect it to the host computer and the receiving computer (which can be the same as the host). Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do. Raspberry Pi probably also works, but again I have not verified it.
 - [Dragonfly](https://github.com/dictation-toolbox/dragonfly) and possibly [Caster](https://github.com/dictation-toolbox/Caster)
 - `pip install pyserial`
 
@@ -24,6 +28,14 @@ The goal is to also have an option to send Dragon dictation via the Arduino, but
 5. Go to Tools > Board > Arduino ARM (32-bit) Boards > Arduino Due (Programming Port)
 6. Go to File > Open and open the `keyboard/keyboard.ino` file in this repository
 7. Click on the upload button in the top left (a rightward pointing arrow) to upload your code onto the Arduino
-8. Clone the repo to your caster or dragonfly installation directory (e.g. Documents/Caster). Dragonfly will automatically the files starting with "_" in the root directory.
+8. Clone the repo to your caster or dragonfly installation directory (e.g. Documents/Caster). Dragonfly will automatically load the files starting with "_" in the root directory.
 
-Now you can launch Dragon and all commands will be sent as hardware keyboard strokes to the output port on the Arduino. It is easier to verify if the output is on a different computer.
+## Run
+1. Launch `arduino/run.bat`. This process receives commands as direct input and from dragonfly, and sends them to the Arduino.
+2. Now you can launch Dragon and all commands will be sent as hardware keyboard strokes to the output port on the Arduino.
+3. If your input and output computers are different, the input computer should focus the `arduino/run.bat` so that it can capture all dictation. Note that if this process is not focused, dictation won't work but commands still will
+
+## Resilience
+- If `arduino/run.bat` says that it has lost interprocess communication, it will try to automatically reconnect. Sometimes you have to send dictation and commands for it to realize it has been disconnected. If this still doesn't work, close and relaunch `arduino/run.bat`
+- If `arduino/run.bat` says that it has lost connection to the Arduino, close and relaunch `arduino/run.bat`
+- If there are still issues, close both `arduino/run.bat` and Dragon and relaunch everything (follow the instructions in the "Run" section)
