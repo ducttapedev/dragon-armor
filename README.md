@@ -39,3 +39,6 @@ Sometimes, particularly when Dragon armor is first started, you may have to send
 - If `arduino/run.bat` says that it has lost interprocess communication, it will try to automatically reconnect. Sometimes you have to send dictation and commands for it to realize it has been disconnected. If this still doesn't work, close and relaunch `arduino/run.bat`
 - If `arduino/run.bat` says that it has lost connection to the Arduino, close and relaunch `arduino/run.bat`
 - If there are still issues, close both `arduino/run.bat` and Dragon and relaunch everything (follow the instructions in the "Run" section)
+
+## Contribution
+Contributions are welcome; feel free to submit issues and pull requests. I hang out on the dictation-toolbox gitters (e.g. [Caster](https://gitter.im/dictation-toolbox/Caster), [Dragonfly](https://gitter.im/dictation-toolbox/dragonfly)), so feel free to reach out to me there. You can also e-mail me at the email address [here](https://github.com/michaelscheung/resume/blob/master/Michael%20Cheung%20Resume.pdf) (not listed here directly to prevent spam scrapers).
