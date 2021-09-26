@@ -7,18 +7,26 @@ Caster, Dragonfly, and [Natlink](https://github.com/dictation-toolbox/natlink) h
 This also enables you to have one copy of Dragon control multiple computers, so that you don't have to  reconfigure and retrain Dragon on each of your computers. Yes, you can export and import profiles, but they will inevitably get out of sync if you switch frequently between computers. Furthermore, not everything gets transferred, such as pronunciations.
 
 ## Limitations
-Currently I have not figured out an elegant way to send dictation directly to the Arduino (commands work fine, provided they are keyboard only). If your input and output machines are the same, Dragon functions normally as the dictation is not redirected anywhere. You will still be unable to send dictation to programs that don't work with Dragon's virtual keyboard, like VMware. However, you will now be able to send commands whereas before no interaction at all was possible. (You can also "convert" dictation into a command by prepending it with "say" "slip" or "cop.")
+- Currently, I have not figured out an elegant way to send dictation directly to the Arduino (dragonfly commands work fine, provided they are keyboard only). If your input and output machines are the same, Dragon functions normally as the dictation is not redirected anywhere. You will still be unable to send dictation to programs that don't work with Dragon's virtual keyboard, like VMware. However, you will now be able to send commands whereas before no interaction at all was possible. (You can also "convert" dictation into a command by prepending it with "say" "slip" or "cop.")
 
-If your input and output machines are different, I have a workaround using Python's `getch` and focusing Dragon on the `arduino/run.bat` process, so that every dictation keystroke is captured by the program. Since this is a separate process from Dragon/dragonfly, we use interprocess communication to send commands from dragonfly to `arduino/run.bat` (dragonfly commands can be elegantly captured and sent to the Arduino without using the `getch` hack). `arduino/run.bat` sends both direct dictation and dragonfly commands received via interprocess communication to the Arduino. Dictation stops working if the `arduino/run.bat` process is no longer focused.
+- If your input and output machines are different, I have a workaround using Python's `getch` and focusing Dragon on the `arduino/run.bat` process, so that every dictation keystroke is captured by the program. Since this is a separate process from Dragon/dragonfly, we use interprocess communication to send commands from dragonfly to `arduino/run.bat` (dragonfly commands can be elegantly captured and sent to the Arduino without using the `getch` hack). `arduino/run.bat` sends both direct dictation and dragonfly commands received via interprocess communication to the Arduino. Dictation stops working if the `arduino/run.bat` process is no longer focused.
 
-Currently only keyboard commands are supported. Mouse commands don't work yet.
+- Currently, only keyboard output is supported. Mouse commands don't work yet
 
-Sometimes, particularly when Dragon armor is first started, you may have to send dictation through `arduino/run.bat` before commands work. This issue is probably fixable.
+- Context aware commands don't work if the input and output computers are different. This should theoretically be possible with a process on the output machine that sends the current focused program to the input machine, but for now you will have to make the commands `CCRType.GLOBAL` and keep them always on or enable/disable them manually. For instance, the JetBrains Caster rule can be made global with the following modification to jetbrains.py, which can be done in the Caster user directory (usually AppData/Local/caster):
+```
+def get_rule():
+    details = RuleDetails(ccrtype=CCRType.GLOBAL)
+    return JetBrains, details
+```
+
+- When Dragon armor is first started, you may have to send dictation through `arduino/run.bat` to make commands work (simply saying "testing" should work). This also sometimes happens randomly. This issue is probably fixable.
 
 ## Requirements
 - Unfortunately, this does require an Arduino and 2 micro USB cables to connect it to the host computer and the receiving computer (which can be the same as the host). Currently the only one I have verified as working is the [Arduino Due](https://store.arduino.cc/arduino-due) ([sometimes cheaper here](https://www.amazon.com/Arduino-org-A000062-Arduino-Due/dp/B00A6C3JN2)). I am not sure if any others will work but please add to this readme if you find any that do. Raspberry Pi probably also works, but again I have not verified it.
 - [Dragonfly](https://github.com/dictation-toolbox/dragonfly) and possibly [Caster](https://github.com/dictation-toolbox/Caster)
 - `pip install pyserial`
+- If you want the input machine to be a virtual machine, VMware seems to work better than Virtual Box. Virtual Box seems to be much slower to send data to the Arduino, and more prone to having issues requiring program restart.
 
 ## Installation
 1. Download the [Arduino IDE](https://www.arduino.cc/en/software)
