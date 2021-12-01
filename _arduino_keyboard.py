@@ -94,7 +94,7 @@ class ArduinoKeyboard(BaseKeyboard):
     def send_keyboard_events(cls, events):
         try:
             for event in events:
-                LOGGER.info(f"event = {event}")
+                LOGGER.debug(f"event = {event}")
                 character, down, timeout = event[:3]
                 # Some events have a keyboard class as the character as a sort of dummy placeholder to insert delay,
                 # we ignore these
@@ -133,7 +133,7 @@ class ArduinoKeyboard(BaseKeyboard):
                 # Arduino is expecting a three byte array of [character, press/release byte, null byte]
                 arduino_commands = character + (PRESS if down else RELEASE) + b"\x00"
                 # ARDUINO.write(arduino_commands)
-                LOGGER.info(f"Sending command: {arduino_commands}")
+                LOGGER.debug(f"Sending command: {arduino_commands}")
                 arduino.environment.connection.send(arduino_commands)
         except Exception as e:
             LOGGER.error("Error with interprocess communication!")
