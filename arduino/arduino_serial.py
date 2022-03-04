@@ -20,7 +20,7 @@ def connect_arduino():
     # This prints any data we receive from the Arduino programing port (not the keyboard port)
     def handle_data(data):
         if data:
-            LOGGER.error("arduino = " + str(data))
+            LOGGER.info("arduino = " + str(data))
 
     def read_from_port():
         while True:
