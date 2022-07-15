@@ -2,9 +2,11 @@
 This mini-project enables Dragon to send real hardware keystrokes via USB that should be indistinguishable from a normal keyboard. You can also send keystrokes from one computer with Dragon installed (the "input" machine) to another computer (the "output" machine) without. It is built on top of the [Caster](https://github.com/dictation-toolbox/Caster) project, which is itself built on the [Dragonfly](https://github.com/dictation-toolbox/dragonfly) framework. It currently does not depend on any Caster files so it should theoretically work on just Dragonfly, although I have not verified this (please modify this readme if you do).|
 
 ## Motivation
-Caster, Dragonfly, and [Natlink](https://github.com/dictation-toolbox/natlink) have been incredibly useful for those who wish to reduce keyboard usage and those with disabilities that cannot use a normal keyboard, myself included. However, because a virtual keyboard is used, they don't work properly or at all in some situations (e.g. VMware). By sending keystrokes via USB that are indistinguishable from a real keyboard, it should work with all programs.
+Caster, Dragonfly, [Natlink](https://github.com/dictation-toolbox/natlink), and other projects in the voice to text community have been incredibly useful for those who wish to reduce keyboard usage and those with disabilities that cannot use a normal keyboard, myself included. However, because a virtual keyboard is used, they don't work properly or at all in some situations (e.g. VMware, other operating systems like Linux). By sending keystrokes via USB that are indistinguishable from a real keyboard, it should work with all programs and all operating systems. It even works when the computer is still booting up, such as in the BIOS. Basically, anywhere where a normal hardware keyboard works, this should work as well.
 
-This also enables you to have one copy of Dragon control multiple computers, so that you don't have to  reconfigure and retrain Dragon on each of your computers. Yes, you can export and import profiles, but they will inevitably get out of sync if you switch frequently between computers. Furthermore, not everything gets transferred, such as pronunciations.
+This also enables you to have one copy of Dragon control multiple computers, so that you don't have to reconfigure and retrain Dragon on each of your computers. Yes, you can export and import profiles, but they will inevitably get out of sync if you switch frequently between computers. Furthermore, not everything gets transferred, such as pronunciations.
+
+I am personally running Dragon in a VM and using it to control two other Linux machines and a Windows machine.
 
 ## Limitations
 ### Dictation
@@ -50,7 +52,7 @@ When Dragon armor is first started, you may have to send dictation through `ardu
 3. If your input and output computers are different, the input computer should focus the `arduino/run.bat` so that it can capture all dictation. Note that if this process is not focused, dictation won't work but commands still will
 
 ## Resilience
-- If `arduino/run.bat` says that it has lost interprocess communication, it will try to automatically reconnect. Sometimes you have to send dictation and commands for it to realize it has been disconnected. If this still doesn't work, close and relaunch `arduino/run.bat`
+- If `arduino/run.bat` says that it has lost interprocess communication, such as when you restart Dragon, it will print "Disconnected, relistening for interprocess connection" and try to automatically reconnect. On success, it will print "Interprocess reconnected!" Sometimes you have to send commands for it to realize it has been disconnected. If this still doesn't work, close and relaunch `arduino/run.bat`
 - If `arduino/run.bat` says that it has lost connection to the Arduino, close and relaunch `arduino/run.bat`
 - If there are still issues, close both `arduino/run.bat` and Dragon and relaunch everything (follow the instructions in the "Run" section)
 
