@@ -132,9 +132,6 @@ def mixed_word_to_number(number_sentence):
         raise ValueError(
             "Type of input is not string! Please enter a valid number word (eg. \'two million twenty three thousand and forty nine\')")
 
-    number_sentence = number_sentence.replace('-', ' ')
-    number_sentence = number_sentence.lower()  # converting input to lowercase
-
     if number_sentence.isdigit():  # return the number if user enters a number string
         return int(number_sentence)
 
@@ -143,8 +140,9 @@ def mixed_word_to_number(number_sentence):
     number_words = []
     result = []
     for word in split_words:
+        normalized_number_word = word.replace('-', ' ').lower()
         if word in american_number_system:
-            number_words.append(word)
+            number_words.append(normalized_number_word)
         else:
             if number_words:
                 result.append(str(word_to_num(number_words)))

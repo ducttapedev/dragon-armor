@@ -38,7 +38,7 @@ def receive_commands_from_dragonfly():    # family is deduced to be 'AF_INET'
             LOGGER.warning("Interprocess reconnected!")
 
 
-def receive_dictation_from_dragon():
+def receive_dictation_from_command_line():
     while True:
         try:
             character = getch()
@@ -54,7 +54,7 @@ def receive_dictation_from_dragon():
 
 def main():
     threading.Thread(target=receive_commands_from_dragonfly).start()
-    receive_dictation_from_dragon()
+    # receive_dictation_from_command_line()
 
 
 if __name__ == "__main__":
