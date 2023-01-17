@@ -1,16 +1,7 @@
 from __future__ import print_function
 
-american_number_system = {
-    'zero': 0,
-    'one': 1,
-    'two': 2,
-    'three': 3,
-    'four': 4,
-    'five': 5,
-    'six': 6,
-    'seven': 7,
-    'eight': 8,
-    'nine': 9,
+# Words that are always interpreted as numbers regardless of context
+ANYWHERE_NUMERICAL_WORDS = {
     'ten': 10,
     'eleven': 11,
     'twelve': 12,
@@ -29,11 +20,40 @@ american_number_system = {
     'seventy': 70,
     'eighty': 80,
     'ninety': 90,
+}
+
+# Words that should be typed out as a complete word if they are on their own,
+# but should be converted into a number if they are a part of a larger numeric word
+NON_SINGLE_NUMERIC_WORDS = {
+    'zero': 0,
+    'one': 1,
+    'two': 2,
+    'three': 3,
+    'four': 4,
+    'five': 5,
+    'six': 6,
+    'seven': 7,
+    'eight': 8,
+    'nine': 9,
+}
+
+# Words that can be a part of a number, but not the first word
+NONSTARTER_NUMERICAL_WORDS = {
     'hundred': 100,
     'thousand': 1000,
     'million': 1000000,
     'billion': 1000000000,
     'point': '.'
+}
+
+NONSTARTER_NUMERICAL_JOINING_WORDS = [
+    'and',
+]
+
+ALL_NUMERIC_WORDS = {
+    **ANYWHERE_NUMERICAL_WORDS,
+    **NON_SINGLE_NUMERIC_WORDS,
+    **NONSTARTER_NUMERICAL_WORDS,
 }
 
 decimal_words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
@@ -77,18 +97,17 @@ indian_number_system = {
 }
 """
 
-"""
-function to form numeric multipliers for million, billion, thousand etc.
-
-input: list of strings
-return value: integer
-"""
-
 
 def number_formation(number_words):
+    """
+    function to form numeric multipliers for million, billion, thousand etc.
+    Python function documentation before or after function definition
+    input: list of strings
+    return value: integer
+    """
     numbers = []
     for number_word in number_words:
-        numbers.append(american_number_system[number_word])
+        numbers.append(ALL_NUMERIC_WORDS[number_word])
     if len(numbers) == 4:
         return (numbers[0] * numbers[1]) + numbers[2] + numbers[3]
     elif len(numbers) == 3:
@@ -102,35 +121,32 @@ def number_formation(number_words):
         return numbers[0]
 
 
-"""
-function to convert post decimal digit words to numerial digits
-input: list of strings
-output: double
-"""
-
-
 def get_decimal_sum(decimal_digit_words):
+    """
+    function to convert post decimal digit words to numerial digits
+    input: list of strings
+    output: double
+    """
     decimal_number_str = []
     for dec_word in decimal_digit_words:
         if dec_word not in decimal_words:
             return 0
         else:
-            decimal_number_str.append(american_number_system[dec_word])
+            decimal_number_str.append(ALL_NUMERIC_WORDS[dec_word])
     final_decimal_string = '0.' + ''.join(map(str, decimal_number_str))
     return float(final_decimal_string)
 
 
-"""
-function to return integer for an input `number_sentence` string
-input: string
-output: int or double or None
-"""
-
-
 def mixed_word_to_number(number_sentence):
+    """
+    Convert a sentence that may contain both regular words and numerical words into
+    a sentence that replaces the numerical words with numbers
+    """
     if type(number_sentence) is not str:
         raise ValueError(
-            "Type of input is not string! Please enter a valid number word (eg. \'two million twenty three thousand and forty nine\')")
+            "Type of input is not string! Please enter a valid number word"
+            " (eg. \'two million twenty three thousand and forty nine\')"
+        )
 
     if number_sentence.isdigit():  # return the number if user enters a number string
         return int(number_sentence)
@@ -140,20 +156,52 @@ def mixed_word_to_number(number_sentence):
     number_words = []
     result = []
     for word in split_words:
-        normalized_number_word = word.replace('-', ' ').lower()
-        if word in american_number_system:
-            number_words.append(normalized_number_word)
+        # Normalize the word to make it easier to identify if it is numeric
+        normalized_word = normalize_word_for_number(word)
+
+        # Words that are always interpreted as numeric
+        if normalized_word in ANYWHERE_NUMERICAL_WORDS or normalized_word in NON_SINGLE_NUMERIC_WORDS:
+            number_words.append(word)
+        # Words that are interpreted as numeric if they are not the first word
+        elif number_words and (normalized_word in NONSTARTER_NUMERICAL_WORDS
+                               or normalized_word in NONSTARTER_NUMERICAL_JOINING_WORDS):
+            number_words.append(word)
+        # Words that are not interpreted as numeric
         else:
-            if number_words:
-                result.append(str(word_to_num(number_words)))
+            # Convert the preceding string of numeric words into numbers, if preceded by such
+            if number_words and len(number_words) == 1 \
+                    and normalize_word_for_number(number_words[0]) in NON_SINGLE_NUMERIC_WORDS:
+                result.append(number_words)
+                number_words = []
+            elif number_words:
+                normalized_number_words = [
+                    normalize_word_for_number(w)
+                    for w in number_words
+                    if normalize_word_for_number(w) in ALL_NUMERIC_WORDS
+                ]
+                result.append(str(word_to_num(normalized_number_words)))
                 number_words = []
             result.append(word)
+
+    # Convert the last string of numeric words into numbers, if it ends with numeric words
     if number_words:
         result.append(str(word_to_num(number_words)))
     return result
 
 
+def normalize_word_for_number(word):
+    """
+    Normalize the word to make it easier to identify if it is numeric
+    """
+    return word.lower()
+
+
 def word_to_num(clean_numbers):
+    """
+    function to return integer for an input `number_sentence` string
+    input: string
+    output: int or double or None
+    """
     clean_decimal_numbers = []
 
     # Error message if the user enters invalid input!
@@ -186,7 +234,7 @@ def word_to_num(clean_numbers):
     if len(clean_numbers) > 0:
         # hack for now, better way TODO
         if len(clean_numbers) == 1:
-            total_sum += american_number_system[clean_numbers[0]]
+            total_sum += ANYWHERE_NUMERICAL_WORDS[clean_numbers[0]]
 
         else:
             if billion_index > -1:
