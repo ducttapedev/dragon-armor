@@ -169,24 +169,30 @@ def mixed_word_to_number(number_sentence):
         # Words that are not interpreted as numeric
         else:
             # Convert the preceding string of numeric words into numbers, if preceded by such
-            if number_words and len(number_words) == 1 \
-                    and normalize_word_for_number(number_words[0]) in NON_SINGLE_NUMERIC_WORDS:
-                result.append(number_words)
-                number_words = []
-            elif number_words:
-                normalized_number_words = [
-                    normalize_word_for_number(w)
-                    for w in number_words
-                    if normalize_word_for_number(w) in ALL_NUMERIC_WORDS
-                ]
-                result.append(str(word_to_num(normalized_number_words)))
+            if number_words:
+                result += maybe_word_to_number(number_words)
                 number_words = []
             result.append(word)
 
     # Convert the last string of numeric words into numbers, if it ends with numeric words
     if number_words:
-        result.append(str(word_to_num(number_words)))
+        result += maybe_word_to_number(number_words)
     return result
+
+
+def maybe_word_to_number(number_words):
+    if not number_words:
+        return []
+    # Convert the preceding string of numeric words into numbers, if preceded by such
+    if len(number_words) == 1 and normalize_word_for_number(number_words[0]) in NON_SINGLE_NUMERIC_WORDS:
+        return number_words
+
+    normalized_number_words = [
+        normalize_word_for_number(w)
+        for w in number_words
+        if normalize_word_for_number(w) in ALL_NUMERIC_WORDS
+    ]
+    return [str(word_to_num(normalized_number_words))]
 
 
 def normalize_word_for_number(word):
@@ -197,23 +203,20 @@ def normalize_word_for_number(word):
 
 
 def word_to_num(clean_numbers):
-    """
-    function to return integer for an input `number_sentence` string
-    input: string
-    output: int or double or None
-    """
     clean_decimal_numbers = []
 
     # Error message if the user enters invalid input!
     if len(clean_numbers) == 0:
         raise ValueError(
-            "No valid number words found! Please enter a valid number word (eg. two million twenty three thousand and forty nine)")
+            "No valid number words found! Please enter a valid number word"
+            " (eg. two million twenty three thousand and forty nine)")
 
     # Error if user enters million,billion, thousand or decimal point twice
     if clean_numbers.count('thousand') > 1 or clean_numbers.count('million') > 1 or clean_numbers.count(
             'billion') > 1 or clean_numbers.count('point') > 1:
         raise ValueError(
-            "Redundant number word! Please enter a valid number word (eg. two million twenty three thousand and forty nine)")
+            "Redundant number word! Please enter a valid number word"
+            " (eg. two million twenty three thousand and forty nine)")
 
     # separate decimal part of number (if exists)
     if clean_numbers.count('point') == 1:
